@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 const tempMovieData = [
   {
@@ -50,34 +50,8 @@ const tempWatchedData = [
 const average = (arr) =>
   arr.reduce((acc, cur, i, arr) => acc + cur / arr.length, 0);
 export default function App() {
-  const [movies, setMovies] = useState([]);
-  const [watched, setWatched] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
-
-  const KEY = '8ac301b4';
-
-  useEffect(function () {
-    async function fetchMovies() {
-      try {
-        setIsLoading(true);
-        const res = await fetch(
-          `http://www.omdbapi.com/?apikey=${KEY}&s=source code`
-        );
-        if (!res.ok)
-          throw new Error(
-            'There is something went wrong with fetching the movies'
-          );
-        const data = await res.json();
-        setMovies(data.Search);
-        setIsLoading(false);
-      } catch (err) {
-        console.error(err.message);
-        setError(err.message);
-      }
-    }
-    fetchMovies();
-  }, []);
+  const [movies, setMovies] = useState(tempMovieData);
+  const [watched, setWatched] = useState(tempWatchedData);
 
   return (
     <div className="main-div">
@@ -88,26 +62,13 @@ export default function App() {
       </NavBar>
       <Main>
         <Box>
-          {isLoading && <Loader />}
-          {!isLoading && !error && <MovieList movies={movies} />}
-          {error && <showError message={error} />}
+          <MovieList movies={movies} />
         </Box>
         <Box>
           <WatchedSummary watched={watched} />
           <WatchedMovieList watched={watched} />
         </Box>
       </Main>
-    </div>
-  );
-}
-function Loader() {
-  return <p className="loader">Loading...</p>;
-}
-function showError({ message }) {
-  return (
-    <div>
-      <span></span>
-      <p className="error">{message}</p>
     </div>
   );
 }
@@ -118,9 +79,7 @@ function NavBar({ children }) {
 function Logo() {
   return (
     <div className="logo">
-      <span role="img" aria-label="popcorn">
-        🍿
-      </span>
+      <span role="img">🍿</span>
       <h1>usePopcorn</h1>
     </div>
   );
