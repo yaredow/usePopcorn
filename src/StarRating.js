@@ -1,78 +1,88 @@
-import { useState } from 'react';
-import PropTypes from 'prop-types';
+import { useState } from "react";
+import PropTypes from "prop-types";
 
 const containerStyle = {
-  display: 'flex',
-  alignItems: 'center',
-  gap: '16px',
+  display: "flex",
+  alignItems: "center",
+  gap: "16px",
 };
 
 const starContainerStyle = {
-  display: 'flex',
+  display: "flex",
 };
 
 StarRating.propTypes = {
   maxRating: PropTypes.number,
+  defaultRating: PropTypes.number,
   color: PropTypes.string,
   size: PropTypes.number,
+  messages: PropTypes.array,
+  className: PropTypes.string,
 };
 
 export default function StarRating({
-  maxRating,
-  color = '#fcc419',
-  size = '48',
+  maxRating = 5,
+  color = "#fcc419",
+  size = 48,
+  className = "",
+  messages = [],
+  defaultRating = 0,
+  onSetRating,
 }) {
-  const [rating, setRating] = useState(0);
+  const [rating, setRating] = useState(defaultRating);
   const [tempRating, setTempRating] = useState(0);
 
   function handleRating(rating) {
     setRating(rating);
+    onSetRating(rating);
   }
 
   const textStyle = {
-    margin: '0',
-    lineHeight: '1',
-    color: color,
+    lineHeight: "1",
+    margin: "0",
+    color,
     fontSize: `${size / 1.5}px`,
   };
 
   return (
-    <div style={containerStyle}>
+    <div style={containerStyle} className={className}>
       <div style={starContainerStyle}>
         {Array.from({ length: maxRating }, (_, i) => (
           <Star
             key={i}
             full={tempRating ? tempRating >= i + 1 : rating >= i + 1}
-            onClick={() => handleRating(i + 1)}
-            onMouseIn={() => setTempRating(i + 1)}
-            onMouseOut={() => setTempRating(0)}
+            onRate={() => handleRating(i + 1)}
+            onHoverIn={() => setTempRating(i + 1)}
+            onHoverOut={() => setTempRating(0)}
             color={color}
             size={size}
           />
         ))}
       </div>
-      <p style={textStyle}>{tempRating || rating || ''}</p>
+      <p style={textStyle}>
+        {messages.length === maxRating
+          ? messages[tempRating ? tempRating - 1 : rating - 1]
+          : tempRating || rating || ""}
+      </p>
     </div>
   );
 }
 
-function Star({ onClick, onMouseIn, onMouseOut, full, size, color }) {
+function Star({ onRate, full, onHoverIn, onHoverOut, color, size }) {
   const starStyle = {
-    height: `${size}px`,
     width: `${size}px`,
-    display: 'block',
-    input: 'pointer',
-    color: color,
-    size: size,
+    height: `${size}px`,
+    display: "block",
+    cursor: "pointer",
   };
 
   return (
     <span
       role="button"
       style={starStyle}
-      onClick={onClick}
-      onMouseEnter={onMouseIn}
-      onMouseLeave={onMouseOut}
+      onClick={onRate}
+      onMouseEnter={onHoverIn}
+      onMouseLeave={onHoverOut}
     >
       {full ? (
         <svg
